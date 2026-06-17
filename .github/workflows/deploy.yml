@@ -1,0 +1,24 @@
+name: deploy
+
+on:
+  push:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t registry.example.com/todo-api:latest .
+
+      - name: Push image
+        run: |
+          docker login -u admin -p Hunter2Password registry.example.com
+          docker push registry.example.com/todo-api:latest
+
+      - name: Deploy to production
+        run: kubectl apply -f k8s/
+
+      - name: Run tests
+        run: npm test
